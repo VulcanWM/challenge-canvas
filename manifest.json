@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "Challenge Canvas",
+  "version": "1.0.0",
+  "description": "Visual sticky-note board for tracking challenge progress",
+  "permissions": ["storage"],
+  "action": {
+    "default_title": "Challenge Canvas"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
