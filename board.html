@@ -5,67 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Challenge Canvas</title>
     <style>
-        body {
-            margin: 0;
-            font-family: sans-serif;
-            background: #222; /* blackboard background */
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
-        #board {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
+        body { margin:0; font-family:sans-serif; background:#222; height:100vh; width:100vw; overflow:hidden; }
+        #board { position:relative; width:100%; height:100%; }
         .note {
-            position: absolute;
-            width: 120px;
-            min-height: 60px;
-            padding: 6px;
-            background: yellow;
-            border-radius: 4px;
-            cursor: grab;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            user-select: none;
-            transition: transform 0.2s;
+            position:absolute; width:120px; min-height:60px; padding:6px; background:yellow;
+            border-radius:4px; cursor:grab; box-shadow:0 2px 6px rgba(0,0,0,0.3); user-select:none; transition: transform 0.2s;
         }
-        .highlight {
-            box-shadow: 0 0 10px 3px #0af;
-            transform: scale(1.05);
-        }
+        .note.highlight { box-shadow:0 0 10px 3px #0af; transform:scale(1.05); }
+        .note.highlighted { box-shadow:0 0 12px 4px #ff0; } /* user-highlighted yellow glow */
         #controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: #fffdf5;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-            padding: 12px;
-            max-width: 200px;
+            position:absolute; top:20px; right:20px; background:#fffdf5; border:1px solid #ddd; border-radius:6px;
+            box-shadow:2px 2px 6px rgba(0,0,0,0.3); padding:12px; max-width:200px;
         }
         #controls h3 { margin:0 0 10px 0; font-size:14px; text-align:center; }
-        input {
-            padding: 4px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            margin-bottom: 6px;
-            width: calc(100% - 10px);
-        }
-        #emojiInput { width: 50px; display:inline-block; }
-        button {
-            display: block;
-            width: 100%;
-            margin: 6px 0;
-            padding: 6px;
-            border-radius: 4px;
-            border: 1px solid #333;
-            background: #222;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover { background: #444; }
+        input { padding:4px; border-radius:4px; border:1px solid #ccc; margin-bottom:6px; width:calc(100% - 10px); }
+        #emojiInput { width:50px; display:inline-block; }
+        button { display:block; width:100%; margin:6px 0; padding:6px; border-radius:4px; border:1px solid #333; background:#222; color:white; cursor:pointer; }
+        button:hover { background:#444; }
     </style>
 </head>
 <body>

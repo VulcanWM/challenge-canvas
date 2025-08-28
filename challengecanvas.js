@@ -43,13 +43,16 @@ function renderNotes(){
         div.style.top = n.y + 'px';
         div.textContent = `${n.emoji||'🙂'} Day ${n.day}: ${n.text}`;
 
-        // Highlight all notes for the playing day
+        // Highlight play day
         if(playDay !== null && n.day === playDay){
             div.classList.add('highlight');
             div.style.zIndex = 999;
         } else {
             div.style.zIndex = 1;
         }
+
+        // Highlighted toggle
+        if(n.highlighted) div.classList.add('highlighted');
 
         // Delete button
         const delBtn = document.createElement('span');
@@ -61,12 +64,20 @@ function renderNotes(){
         delBtn.style.fontWeight = 'bold';
         delBtn.style.color = '#900';
         delBtn.onclick = (e)=>{
-            e.stopPropagation(); // prevent dragging
-            notes.splice(idx, 1);
+            e.stopPropagation();
+            notes.splice(idx,1);
             saveNotes();
             renderNotes();
         };
         div.appendChild(delBtn);
+
+        // Toggle highlighted on double-click
+        div.ondblclick = (e)=>{
+            e.stopPropagation();
+            n.highlighted = !n.highlighted;
+            saveNotes();
+            renderNotes();
+        }
 
         // Drag
         div.onpointerdown = (e)=>{
@@ -98,7 +109,7 @@ addBtn.onclick = ()=>{
     const x = Math.random() * (board.clientWidth - 120);
     const y = Math.random() * (board.clientHeight - 60);
 
-    notes.push({text, emoji, x, y, day: dayNumber});
+    notes.push({text, emoji, x, y, day: dayNumber, highlighted:false});
     saveNotes();
     renderNotes();
     textInput.value = '';
