@@ -4,14 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Challenge Canvas</title>
+
+    <!-- Chalkboard font -->
+    <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Schoolbell&display=swap" rel="stylesheet">
+
     <style>
         body {
             margin: 0;
-            font-family: sans-serif;
-            background: #222;
+            font-family: 'Gloria Hallelujah', 'Schoolbell', cursive, sans-serif;
+            background: #1c1c1c;
+            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+            radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
             height: 100vh;
             width: 100vw;
             overflow: hidden;
+            color: white;
+        }
+
+        #title {
+            text-align: center;
+            font-size: 28px;
+            color: #fefefe;
+            margin-top: 15px;
+            text-shadow: 1px 1px 2px #000;
         }
 
         #board {
@@ -20,65 +36,99 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0; /* behind controls */
+            z-index: 0;
         }
 
         .note {
             position: absolute;
-            width: 120px;
+            width: 140px;
             min-height: 60px;
-            padding: 6px;
-            border-radius: 4px;
+            padding: 8px;
+            border-radius: 6px;
             cursor: grab;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
             user-select: none;
             transition: transform 0.2s;
+            font-size: 14px;
+            transform: rotate(calc(-3deg + 6deg * random()));
         }
+
         .highlight {
-            box-shadow: 0 0 10px 3px #0af;
-            transform: scale(1.05);
+            box-shadow: 0 0 12px 4px #0af;
+            transform: scale(1.07);
         }
+
         .highlighted {
-            box-shadow: 0 0 10px 3px yellow;
+            box-shadow: 0 0 14px 4px yellow;
         }
 
         #controls {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: #fffdf5;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-            padding: 12px;
-            max-width: 220px;
-            z-index: 10; /* above board */
-            pointer-events: auto;
+            background: rgba(28, 28, 28, 0.9);
+            border: 2px solid #555;
+            border-radius: 12px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+            padding: 14px;
+            max-width: 230px;
+            z-index: 10;
+            color: #fefefe;
+            font-size: 14px;
         }
 
-        #controls h3 { margin:0 0 10px 0; font-size:14px; text-align:center; }
+        #controls h3 {
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            text-align: center;
+            color: #fff;
+            border-bottom: 1px dashed #888;
+            padding-bottom: 6px;
+        }
 
         input, select, button {
-            padding: 4px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            margin-bottom: 6px;
-            width: calc(100% - 10px);
+            font-family: inherit;
+            padding: 6px;
+            border-radius: 6px;
+            border: none;
+            margin-bottom: 8px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        input, select {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
         }
 
         button {
-            background: #222;
+            background: #444;
             color: white;
+            border: 1px solid #777;
             cursor: pointer;
-            border: 1px solid #333;
+            transition: all 0.2s;
         }
 
-        button:hover { background: #444; }
+        button:hover {
+            background: #666;
+            transform: scale(1.05);
+        }
 
-        #challengeToggles button { width: auto; padding: 2px 4px; margin-left: 4px; }
+        #challengeToggles {
+            max-height: 100px;
+            overflow: auto;
+            margin: 6px 0;
+        }
+
+        #challengeToggles label {
+            margin-left: 6px;
+        }
     </style>
 </head>
 <body>
+
+<h1 id="title">Challenge Canvas 📝</h1>
 
 <div id="board"></div>
 
@@ -89,7 +139,7 @@
     <button id="addChallengeBtn">Add Challenge</button>
 
     <select id="challengeSelect"></select>
-    <div id="challengeToggles" style="max-height:100px; overflow:auto; margin:6px 0;"></div>
+    <div id="challengeToggles"></div>
 
     <input id="textInput" placeholder="Short summary"/>
     <input id="emojiInput" placeholder="🙂"/>
