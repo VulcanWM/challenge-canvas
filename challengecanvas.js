@@ -3,69 +3,109 @@ const addBtn = document.getElementById('addBtn');
 const playBtn = document.getElementById('playBtn');
 const randBtn = document.getElementById('randBtn');
 const exportBtn = document.getElementById('exportBtn');
+const resetBtn = document.getElementById('resetBtn');
 const textInput = document.getElementById('textInput');
 const emojiInput = document.getElementById('emojiInput');
+const startDateInput = document.getElementById('startDate');
 
 let notes = [];
 let dragging = null;
-let offsetX=0, offsetY=0;
-let playIndex = -1;
+let offsetX = 0, offsetY = 0;
 let playing = false;
+let playDay = null;
+let startDate = null;
 
-// Load from chrome.storage
-chrome.storage.local.get(['notes'], (result)=>{
-    if(result.notes) notes=result.notes;
+// Load from storage
+chrome.storage.local.get(['notes', 'startDate'], (result)=>{
+    if(result.notes) notes = result.notes;
+    if(result.startDate){
+        startDate = new Date(result.startDate);
+        startDateInput.value = result.startDate;
+    }
     renderNotes();
 });
 
-// Save notes
+// Save notes and startDate
 function saveNotes(){
-    chrome.storage.local.set({notes});
+    chrome.storage.local.set({
+        notes,
+        startDate: startDate ? startDate.toISOString().slice(0,10) : null
+    });
 }
 
-// Render all notes
+// Render notes
 function renderNotes(){
-    board.innerHTML='';
+    board.innerHTML = '';
     notes.forEach((n, idx)=>{
         const div = document.createElement('div');
-        div.className='note';
-        div.style.left = n.x+'px';
-        div.style.top = n.y+'px';
-        div.textContent = `${n.emoji||'🙂'} Day ${idx+1}: ${n.text}`;
+        div.className = 'note';
+        div.style.left = n.x + 'px';
+        div.style.top = n.y + 'px';
+        div.textContent = `${n.emoji||'🙂'} Day ${n.day}: ${n.text}`;
 
-        // highlight + bring to front if playing
-        if(idx === playIndex){
+        // Highlight all notes for the playing day
+        if(playDay !== null && n.day === playDay){
             div.classList.add('highlight');
-            div.style.zIndex = 999;   // temporarily on top
+            div.style.zIndex = 999;
         } else {
-            div.style.zIndex = 1;     // normal stacking
+            div.style.zIndex = 1;
         }
+
+        // Delete button
+        const delBtn = document.createElement('span');
+        delBtn.textContent = '×';
+        delBtn.style.position = 'absolute';
+        delBtn.style.top = '2px';
+        delBtn.style.right = '4px';
+        delBtn.style.cursor = 'pointer';
+        delBtn.style.fontWeight = 'bold';
+        delBtn.style.color = '#900';
+        delBtn.onclick = (e)=>{
+            e.stopPropagation(); // prevent dragging
+            notes.splice(idx, 1);
+            saveNotes();
+            renderNotes();
+        };
+        div.appendChild(delBtn);
 
         // Drag
         div.onpointerdown = (e)=>{
-            dragging=div;
+            dragging = div;
             offsetX = e.clientX - n.x - board.getBoundingClientRect().left;
             offsetY = e.clientY - n.y - board.getBoundingClientRect().top;
         };
+
         board.appendChild(div);
     });
 }
 
-
 // Add note
 addBtn.onclick = ()=>{
-    const text=textInput.value.trim();
-    const emoji=emojiInput.value.trim()||'🙂';
+    const text = textInput.value.trim();
+    const emoji = emojiInput.value.trim() || '🙂';
     if(!text) return;
-    const x = Math.random()*380;
-    const y = Math.random()*380;
-    notes.push({text, emoji, x, y});
+
+    if(!startDateInput.value) return alert("Please set a start date first.");
+    if(!startDate) {
+        startDate = new Date(startDateInput.value);
+        saveNotes();
+    }
+
+    const today = new Date();
+    let dayNumber = Math.floor((today - startDate)/(1000*60*60*24)) + 1;
+    if(dayNumber < 1) dayNumber = 1;
+
+    const x = Math.random() * (board.clientWidth - 120);
+    const y = Math.random() * (board.clientHeight - 60);
+
+    notes.push({text, emoji, x, y, day: dayNumber});
     saveNotes();
     renderNotes();
-    textInput.value=''; emojiInput.value='';
+    textInput.value = '';
+    emojiInput.value = '';
 }
 
-// Dragging events
+// Dragging
 board.onpointermove = (e)=>{
     if(!dragging) return;
     const idx = Array.from(board.children).indexOf(dragging);
@@ -74,7 +114,6 @@ board.onpointermove = (e)=>{
     let nx = e.clientX - rect.left - offsetX;
     let ny = e.clientY - rect.top - offsetY;
 
-    // dynamically constrain inside board
     nx = Math.max(0, Math.min(rect.width - dragging.offsetWidth, nx));
     ny = Math.max(0, Math.min(rect.height - dragging.offsetHeight, ny));
 
@@ -84,50 +123,56 @@ board.onpointermove = (e)=>{
     notes[idx].y = ny;
     saveNotes();
 };
-
-board.onpointerup = ()=>{ dragging=null; }
+board.onpointerup = ()=>{ dragging = null; }
 
 // Randomise
 randBtn.onclick = ()=>{
     const rect = board.getBoundingClientRect();
-
     notes.forEach((n,i)=>{
-        const nx = Math.random() * (rect.width - 120);   // note width ~120
-        const ny = Math.random() * (rect.height - 60);   // note height ~60
-        n.x = nx;
-        n.y = ny;
+        const nx = Math.random() * (rect.width - 120);
+        const ny = Math.random() * (rect.height - 60);
+        n.x = nx; n.y = ny;
         board.children[i].style.left = nx + 'px';
         board.children[i].style.top = ny + 'px';
     });
-
     saveNotes();
     renderNotes();
-};
+}
 
-
-// Play animation
+// Play animation per day
 async function play(){
-    if(playing) return;
+    if(playing || !startDate) return;
     playing = true;
 
-    for(let i = 0; i < notes.length; i++){
-        playIndex = i;
-        renderNotes();                  // now brings current note to front
+    const days = [...new Set(notes.map(n=>n.day))].sort((a,b)=>a-b);
+    for(const day of days){
+        playDay = day;
+        renderNotes();
         await new Promise(r => setTimeout(r, 650));
     }
 
-    playIndex = -1;
+    playDay = null;
     renderNotes();
     playing = false;
 }
 playBtn.onclick = play;
+
+// Reset progress
+resetBtn.onclick = ()=>{
+    if(!confirm("Reset all progress?")) return;
+    notes = [];
+    startDate = null;
+    startDateInput.value = '';
+    saveNotes();
+    renderNotes();
+}
 
 // Export PNG
 exportBtn.onclick = async ()=>{
     const canvas = await html2canvas(board, {backgroundColor:null, scale:2});
     const data = canvas.toDataURL('image/png');
     const a = document.createElement('a');
-    a.href=data;
-    a.download=`progressboard-${new Date().toISOString().slice(0,10)}.png`;
+    a.href = data;
+    a.download = `progressboard-${new Date().toISOString().slice(0,10)}.png`;
     a.click();
 }

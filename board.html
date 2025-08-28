@@ -13,14 +13,11 @@
             width: 100vw;
             overflow: hidden;
         }
-
         #board {
             position: relative;
             width: 100%;
             height: 100%;
         }
-
-        /* Sticky notes */
         .note {
             position: absolute;
             width: 120px;
@@ -37,8 +34,6 @@
             box-shadow: 0 0 10px 3px #0af;
             transform: scale(1.05);
         }
-
-        /* Post-it style menu */
         #controls {
             position: absolute;
             top: 20px;
@@ -50,13 +45,7 @@
             padding: 12px;
             max-width: 200px;
         }
-
-        #controls h3 {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            text-align: center;
-        }
-
+        #controls h3 { margin:0 0 10px 0; font-size:14px; text-align:center; }
         input {
             padding: 4px;
             border-radius: 4px;
@@ -64,12 +53,7 @@
             margin-bottom: 6px;
             width: calc(100% - 10px);
         }
-
-        #emojiInput {
-            width: 50px;
-            display: inline-block;
-        }
-
+        #emojiInput { width: 50px; display:inline-block; }
         button {
             display: block;
             width: 100%;
@@ -81,23 +65,23 @@
             color: white;
             cursor: pointer;
         }
-        button:hover {
-            background: #444;
-        }
+        button:hover { background: #444; }
     </style>
 </head>
 <body>
+
 <div id="board"></div>
 
-<!-- Menu as a white post-it in corner -->
 <div id="controls">
     <h3>Menu</h3>
+    <input id="startDate" type="date" placeholder="Start date" />
     <input id="textInput" placeholder="Short summary" />
     <input id="emojiInput" placeholder="🙂" />
-    <button id="addBtn">Add Day</button>
+    <button id="addBtn">Add Note</button>
     <button id="playBtn">▶ Play</button>
     <button id="randBtn">🔀 Randomise</button>
     <button id="exportBtn">⤓ Export PNG</button>
+    <button id="resetBtn">Reset Progress</button>
 </div>
 
 <script src="html2canvas.min.js"></script>
