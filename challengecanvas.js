@@ -41,27 +41,42 @@ function rebuildChallengeList(){
     challengeSelect.innerHTML='';
     challengeToggles.innerHTML='';
     challenges.forEach((ch,i)=>{
+        // dropdown option
         const opt = document.createElement('option');
         opt.value = ch.name;
         opt.textContent = ch.name;
         challengeSelect.appendChild(opt);
 
+        // container row
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.alignItems = 'center';
+        row.style.marginBottom = '6px';
+
+        // toggle
         const cb = document.createElement('input');
         cb.type='checkbox';
         cb.checked = visibleChallenges[ch.name];
-        cb.id='chk_'+ch.name;
-        cb.onchange = ()=>{ visibleChallenges[ch.name] = cb.checked; renderNotes(); };
+        cb.onchange = ()=>{
+            visibleChallenges[ch.name] = cb.checked;
+            renderNotes();
+        };
 
-        const label = document.createElement('label');
-        label.htmlFor = 'chk_'+ch.name;
+        // label
+        const label = document.createElement('span');
         label.textContent = ch.name;
         label.style.color = ch.color;
-        label.style.display='inline-block';
-        label.style.marginRight='8px';
+        label.style.flex = '1'; // take space between checkbox & delete
+        label.style.marginLeft = '6px';
 
+        // delete button
         const delBtn = document.createElement('button');
         delBtn.textContent='×';
-        delBtn.style.marginLeft='4px';
+        delBtn.style.background='none';
+        delBtn.style.border='none';
+        delBtn.style.color='#f55';
+        delBtn.style.fontSize='16px';
+        delBtn.style.cursor='pointer';
         delBtn.onclick = ()=>{
             if(!confirm(`Delete challenge "${ch.name}"? All its notes will be removed.`)) return;
             notes = notes.filter(n=>n.challenge!==ch.name);
@@ -72,10 +87,12 @@ function rebuildChallengeList(){
             renderNotes();
         };
 
-        challengeToggles.appendChild(cb);
-        challengeToggles.appendChild(label);
-        challengeToggles.appendChild(delBtn);
-        challengeToggles.appendChild(document.createElement('br'));
+        // build row
+        row.appendChild(cb);
+        row.appendChild(label);
+        row.appendChild(delBtn);
+
+        challengeToggles.appendChild(row);
     });
 }
 
