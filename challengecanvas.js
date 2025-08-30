@@ -178,8 +178,14 @@ addBtn.onclick = ()=>{
     let dayNumber = Math.floor((today-start)/(1000*60*60*24))+1;
     if(dayNumber<1) dayNumber=1;
 
-    const x=Math.random()*(board.clientWidth-120);
-    const y=Math.random()*(board.clientHeight-60);
+    const boardRect = board.getBoundingClientRect();
+    const controlsRect = document.getElementById("controls").getBoundingClientRect();
+
+    const availableWidth = boardRect.width - controlsRect.width - 20; // leave space for menu
+    const availableHeight = boardRect.height - 60;
+
+    const x = Math.random() * Math.max(availableWidth - 140, 50); // note width = 140
+    const y = Math.random() * Math.max(availableHeight, 50);
 
     notes.push({text,emoji,x,y,day:dayNumber,highlighted:false,challenge:chName});
     saveAll();
@@ -219,10 +225,15 @@ board.onpointerup=()=>{ dragging=null; };
 
 // Randomise
 randBtn.onclick = ()=>{
-    const rect = board.getBoundingClientRect();
+    const boardRect = board.getBoundingClientRect();
+    const controlsRect = document.getElementById("controls").getBoundingClientRect();
+
+    const availableWidth = boardRect.width - controlsRect.width - 20;
+    const availableHeight = boardRect.height - 60;
+
     notes.forEach(n=>{
-        n.x=Math.random()*(rect.width-120);
-        n.y=Math.random()*(rect.height-60);
+        n.x=Math.random() * Math.max(availableWidth - 140, 50);
+        n.y=Math.random() * Math.max(availableHeight, 50);
     });
     saveAll();
     renderNotes();
