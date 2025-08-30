@@ -79,7 +79,16 @@ function rebuildChallengeList(){
     });
 }
 
-// Render notes
+// Helper: choose black or white text based on background
+function getContrastYIQ(hexcolor){
+    hexcolor = hexcolor.replace("#", "");
+    let r = parseInt(hexcolor.substr(0,2),16);
+    let g = parseInt(hexcolor.substr(2,2),16);
+    let b = parseInt(hexcolor.substr(4,2),16);
+    let yiq = ((r*299)+(g*587)+(b*114))/1000;
+    return (yiq >= 128) ? '#000' : '#fff'; // black for light bg, white for dark bg
+}
+
 // Render notes
 function renderNotes(){
     board.innerHTML='';
@@ -93,6 +102,7 @@ function renderNotes(){
         div.style.left=n.x+'px';
         div.style.top=n.y+'px';
         div.style.background=ch.color;
+        div.style.color=getContrastYIQ(ch.color); // <-- FIX HERE
         div.textContent = `${n.emoji||'🙂'} Day ${n.day}: ${n.text}`;
 
         if(playDay!==null && n.day===playDay){
